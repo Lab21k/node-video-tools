@@ -36,7 +36,6 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
                         .addOption('-shortest')
                         .addInput(audioPath)
                         .addInput(tempName)
-                        .applyAutoPadding()
                         .on('end', () => {
                             resolve()
                             console.log('Audio filtered.')
