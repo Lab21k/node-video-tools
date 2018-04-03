@@ -7,7 +7,7 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
     let tempName = `${temp}.mp4`
 
     return new Promise((resolve, reject) => {
-        ffmpeg('./black.mp4')
+        ffmpeg(__dirname + '/black.mp4')
             .addOption('-strict', 'experimental')
             .complexFilter({
                 filter: 'drawtext',
