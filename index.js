@@ -14,7 +14,7 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
                 options: {
                     fontfile: fontPath,
                     text: text,
-                    fontsize: 24,
+                    fontsize: 32,
                     fontcolor: 'white',
                     x: '(w-text_w)/2',
                     y: '(h-text_h)/2'
