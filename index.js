@@ -18,6 +18,7 @@ module.exports = (filePaths, outPath, audioPath) => {
             ffmpeg()
                 .renice(5)
                 .addOption('-strict', 'experimental')
+                .addOption('-shortest')
                 .addInput(audioPath)
                 .addInput(tempName)
                 .on('end', () => {
