@@ -64,12 +64,28 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
                             .addInput(audioPath)
                             .addInput(tempName)
                             .on('end', () => {
-                                resolve()
                                 console.log('Audio filtered.')
+                                console.log('Adding overlay..')
+
+                                let overlay = ffmpeg(outPath)
+                                    .renice(5)
+                                    .addInput('./snap.png')
+                                    .addOption('-filter_complex', `"[0:v][1:v] overlay=25:25:enable='between(t,0,20)'"`)
+                                    .addOption('-pix_fmt', 'yuv420p')
+                                    .addOption('-c:a', 'copy')
+                                    .saveToFile(file)
+
+                                overlay.on('error', (err) => {
+                                    reject(err)
+                                })
+
+                                overlay.on('end', () => {
+                                    resolve()
+                                })
                             })
                             .on('error', (err) => {
-                                reject(err)
                                 console.log('Audio error', err)
+                                reject(err)
                             })
                             .saveToFile(outPath)
                     })

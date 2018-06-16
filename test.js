@@ -1,6 +1,8 @@
 let videoTools = require('./index')
 
-videoTools(['videos/1.mov', 'videos/2.mov'], 'output.mp4', 'audios/1.mp3')
-  .then(() => {
-    console.log('done')
-  })
+videoTools(['videos/IMG_3472.MOV'], 'output.mp4', 'audios/1.mp3')
+    .then(() => {
+        console.log('done')
+    }).catch((err) => {
+        console.log('wat')
+    })
