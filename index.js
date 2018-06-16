@@ -33,7 +33,7 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
                                 .addOption('-c:a', 'aac')
                                 .addOption('-strict', '-2')
                                 .addOption('-f', 'mp4')
-                                .saveToFile(file)
+                                .saveToFile(`${file}_720.mp4`)
 
                             proc.on('end', () => {
                                 console.log('Scaled video to 720p')
@@ -52,7 +52,7 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
                     console.log('Scaling ended.')
 
                     let proc = filePaths.reduce((acc, file) => {
-                            return acc.input(file)
+                            return acc.input(`${file}_720.mp4`)
                         }, ffmpeg(`${temp}_black.mp4`)
                         .renice(5)
                         .addOption('-strict', 'experimental')
