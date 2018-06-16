@@ -31,6 +31,7 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
                                 .addOption('-crf', '23')
                                 .addOption('-c:a', 'aac')
                                 .addOption('-strict', '-2')
+                                .addOption('-f', 'mp4')
                                 .saveToFile(file)
 
                             proc.on('end', () => {
