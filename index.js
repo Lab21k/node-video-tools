@@ -24,8 +24,9 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
                 Promise.all(
                     filePaths.map((file) => {
                         return new Promise((_resolve, _reject) => {
-                            let proc = ffmpeg(file)
+                            let proc = ffmpeg()
                                 .renice(5)
+                                .addInput(file)
                                 .addOption('-s', 'hd720')
                                 .addOption('-c:v', 'libx264')
                                 .addOption('-crf', '23')
