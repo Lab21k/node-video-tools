@@ -1,10 +1,13 @@
 let ffmpeg = require('fluent-ffmpeg');
 let Promise = require('bluebird')
 
-module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
+module.exports = (videos, outPath, audioPath, text, fontPath) => {
     let rand = Math.random().toString(36).substring(7)
     let temp = `/tmp/temp_video_${rand}`
     let tempName = `${temp}.mp4`
+    let filePaths = videos.map(video => {
+        return video.path
+    })
 
     return new Promise((resolve, reject) => {
         ffmpeg(__dirname + '/black.mp4')
@@ -22,7 +25,8 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
             })
             .on('end', () => {
                 Promise.all(
-                    filePaths.map((file) => {
+                    videos.map((video) => {
+                      let file = video.path
                         return new Promise((_resolve, _reject) => {
                             let proc = ffmpeg()
                                 .renice(5)
@@ -37,7 +41,22 @@ module.exports = (filePaths, outPath, audioPath, text, fontPath) => {
 
                             proc.on('end', () => {
                                 console.log('Scaled video to 720p')
-                                _resolve()
+                                ffmpeg(file)
+                                    .addOption('-strict', 'experimental')
+                                    .complexFilter({
+                                        filter: 'drawtext',
+                                        options: {
+                                            text: video.name,
+                                            fontsize: 54,
+                                            fontcolor: 'white',
+                                            x: '50',
+                                            y: 'h - 100'
+                                        }
+                                    })
+                                    .saveToFile(`${file}`)
+                                    .on('end', () => {
+                                        _resolve()
+                                    })
                             })
 
                             proc.on('error', (err, err2, err3) => {
