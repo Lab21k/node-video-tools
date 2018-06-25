@@ -41,9 +41,16 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
 
                             proc.on('end', () => {
                                 console.log('Scaled video to 720p')
-                                ffmpeg(`${file}_720.mp4`)
-                                    .addOption('-strict', 'experimental')
-                                    .complexFilter({
+                                ffmpeg()
+                                    .renice(5)
+                                    .addInput(`${file}_720.mp4`)
+                                    .addOption('-s', 'hd720')
+                                    .addOption('-c:v', 'libx264')
+                                    .addOption('-strict', '-2')
+                                    .addOption('-crf', '23')
+                                    .addOption('-f', 'mp4')
+                                    .videoFilter([`drawtext=text='${video.name}': fontcolor=white: fontsize=24: box=1: boxcolor=black@0.5: boxborderw=5: x=50: y=h-100`])
+                                    /*.complexFilter({
                                         filter: 'drawtext',
                                         options: {
                                             text: video.name,
@@ -52,8 +59,8 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
                                             x: '50',
                                             y: 'h - 100'
                                         }
-                                    })
-                                    .saveToFile(`${file}_720.mp4`)
+                                    })*/
+                                    .saveToFile(`${file}_720_text.mp4`)
                                     .on('end', () => {
                                         console.log('Added title on video.')
                                         _resolve()
@@ -77,7 +84,7 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
                     console.log('Scaling ended.')
 
                     let proc = filePaths.reduce((acc, file) => {
-                            return acc.input(`${file}_720.mp4`)
+                            return acc.input(`${file}_720_text.mp4`)
                         }, ffmpeg(`${temp}_black.mp4`)
                         .renice(5)
                         .addOption('-strict', 'experimental')
