@@ -41,7 +41,7 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
 
                             proc.on('end', () => {
                                 console.log('Scaled video to 720p')
-                                ffmpeg(file)
+                                ffmpeg(`${file}_720.mp4`)
                                     .addOption('-strict', 'experimental')
                                     .complexFilter({
                                         filter: 'drawtext',
@@ -53,7 +53,7 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
                                             y: 'h - 100'
                                         }
                                     })
-                                    .saveToFile(`${file}`)
+                                    .saveToFile(`${file}_720.mp4`)
                                     .on('end', () => {
                                         console.log('Added title on video.')
                                         _resolve()
