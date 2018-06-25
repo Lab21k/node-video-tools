@@ -55,7 +55,13 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
                                     })
                                     .saveToFile(`${file}`)
                                     .on('end', () => {
+                                        console.log('Added title on video.')
                                         _resolve()
+                                    })
+                                    .on('error', (err) => {
+                                        console.log('ERROED!!')
+                                        console.log(err)
+                                        _reject()
                                     })
                             })
 
