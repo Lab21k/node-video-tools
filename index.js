@@ -76,26 +76,8 @@ const normalizeVideos = (videos) => {
           .saveToFile(`${file}_720.mp4`)
 
         proc.on('end', () => {
-            console.log('Scaled video to 720p')
-            ffmpeg()
-              .renice(5)
-              .addInput(`${file}_720.mp4`)
-              .addOption('-s', 'hd720')
-              .addOption('-c:v', 'libx264')
-              .addOption('-strict', '-2')
-              .addOption('-crf', '23')
-              .addOption('-f', 'mp4')
-              .videoFilter([`drawtext=text='${video.name}': fontcolor=white: fontsize=58: box=1: boxcolor=black@0.5: boxborderw=5: x=50: y=h-100`])
-              .saveToFile(`${file}_720_text.mp4`)
-              .on('end', () => {
-                  console.log('Added title on video.')
-                  _resolve()
-              })
-              .on('error', (err) => {
-                  console.log('ERROED!!')
-                  console.log(err)
-                  _reject()
-              })
+          console.log('Scaled video to 720p')
+          _resolve()
         })
 
         proc.on('error', (err, err2, err3) => {
@@ -175,8 +157,7 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
       console.log('Glue intro videos and black video')
       let introVideos = videos.filter((video) => {
         return video.room.indexOf('intro') > -1
-      })
-      .map((video) => video.path)
+      }).map((video) => `${video.path}_720.mp4`)
 
       introVideos.unshift(`${temp}_black.mp4`)
 
