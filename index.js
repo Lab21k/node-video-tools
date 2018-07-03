@@ -118,7 +118,7 @@ const mergeVideos = (videos, temp, tempName) => {
           return acc.input(file)
         }, ffmpeg()
         .renice(5)
-        .addOption('-strict', 'experimental')
+      .addOption('-strict', 'experimental')
     )
 
     proc.on('end', () => resolve())
