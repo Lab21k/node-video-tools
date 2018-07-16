@@ -135,7 +135,7 @@ const mergeVideos = (videos, temp, tempName) => {
   })
 }
 
-module.exports = (videos, outPath, audioPath, text, fontPath) => {
+function audioIntro(videos, outPath, audioPath, text, fontPath) {
   let fontSize = Math.ceil((1280 / text.length))
   let rand = Math.random().toString(36).substring(7)
   let temp = `/tmp/temp_video_${rand}`
@@ -169,4 +169,44 @@ module.exports = (videos, outPath, audioPath, text, fontPath) => {
       let finalVideo = [`${temp}_intro.mp4`, `${temp}_video_audio.mp4`]
       return mergeVideos(finalVideo, temp, outPath)
     })
+}
+
+function muteIntro(videos, outPath, audioPath, text, fontPath) {
+  let fontSize = Math.ceil((1280 / text.length))
+  let rand = Math.random().toString(36).substring(7)
+  let temp = `/tmp/temp_video_${rand}`
+  let tempName = `${temp}.mp4`
+
+  return normalizeVideos(videos)
+    .then(() => titleVideos(videos))
+    .then(() => {
+      let allButIntro = videos.filter((video) => {
+        return video.room.indexOf('intro') < 0
+      }).map(video => {
+        return `${video.path}_720_text.mp4`
+      })
+
+      return mergeVideos(allButIntro, temp, `${temp}_video.mp4`)
+    })
+    .then(() => createBlackVideo(fontSize, text, fontPath, temp))
+    .then(() => {
+      console.log('Finally glueing everything together')
+
+      let introVideos = videos.filter((video) => {
+        return video.room.indexOf('intro') > -1
+      }).map((video) => `${video.path}_720.mp4`)
+
+      let finalVideo = [`${temp}_black.mp4`]
+        .concat(introVideos)
+
+      finalVideo.push(`${temp}_video.mp4`)
+
+      return mergeVideos(finalVideo, temp, `${temp}_glued_video.mp4`)
+    })
+    .then(() => addAudio(`${temp}_glued_video.mp4`, audioPath, outPath))
+}
+
+module.exports = {
+  muteIntro,
+  audioIntro
 }
