@@ -31,7 +31,7 @@ const createBlackVideo = (fontSize, text, fontPath, temp) => {
 const titleVideos = (videos) => {
   console.log('Adding title to videos...')
 
-  return Promise.all(videos.map((video) => {
+  return Promise.map(videos, (video) => {
     let file = video.path
 
     return new Promise((resolve, reject) => {
@@ -55,14 +55,15 @@ const titleVideos = (videos) => {
             reject()
         })
     })
-  }))
+  }, {concurrency: 1})
 }
 
 const normalizeVideos = (videos) => {
   console.log('Normalizing videos..')
 
-  return Promise.all(videos.map((video) => {
+  return Promise.map(videos, (video) => {
     let file = video.path
+
     return new Promise((_resolve, _reject) => {
         let proc = ffmpeg()
           .renice(5)
@@ -87,7 +88,7 @@ const normalizeVideos = (videos) => {
             _reject(err)
         })
     })
-  }))
+  }, { concurrency: 1 })
 }
 
 const addAudio = (videoPath, audioPath, outPath) => {
