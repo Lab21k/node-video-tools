@@ -28,7 +28,7 @@ const createBlackVideo = (fontSize, text, fontPath, temp) => {
   })
 }
 
-const titleVideos = (videos) => {
+const titleVideos = (videos, font) => {
   console.log('Adding title to videos...')
 
   return Promise.map(videos, (video) => {
@@ -43,7 +43,7 @@ const titleVideos = (videos) => {
         .addOption('-strict', '-2')
         .addOption('-crf', '23')
         .addOption('-f', 'mp4')
-        .videoFilter([`drawtext=text='${video.name}': fontcolor=white: fontsize=58: box=1: boxcolor=black@0.5: boxborderw=5: x=50: y=h-100`])
+        .videoFilter([`drawtext=text='${video.name}': fontfile=${font}: fontcolor=white: fontsize=58: box=1: boxcolor=black@0.5: boxborderw=5: x=50: y=h-100: borderw=2:bordercolor=black:box=0`])
         .saveToFile(`${file}_720_text.mp4`)
         .on('end', () => {
             console.log('Added title on video.')
@@ -178,7 +178,7 @@ function muteIntro(videos, outPath, audioPath, text, fontPath) {
   let tempName = `${temp}.mp4`
 
   return normalizeVideos(videos)
-    .then(() => titleVideos(videos))
+    .then(() => titleVideos(videos, fontPath))
     .then(() => {
       let allButIntro = videos.filter((video) => {
         return video.room.indexOf('intro') < 0
