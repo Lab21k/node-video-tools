@@ -1,5 +1,6 @@
 let ffmpeg = require('fluent-ffmpeg');
 let Promise = require('bluebird')
+let getDuration = require('get-video-duration')
 
 const createBlackVideo = (fontSize, text, fontPath, temp) => {
   console.log('Creating black video..')
@@ -65,27 +66,42 @@ const normalizeVideos = (videos) => {
     let file = video.path
 
     return new Promise((_resolve, _reject) => {
-        let proc = ffmpeg()
-          .renice(5)
-          .addInput(file)
-          .addOption('-s', 'hd720')
-          .addOption('-c:v', 'libx264')
-          .addOption('-crf', '23')
-          .addOption('-c:a', 'aac')
-          .addOption('-strict', '-2')
-          .addOption('-f', 'mp4')
-          .saveToFile(`${file}_720.mp4`)
+        getDuration(file)
+        .then(duration => {
+          console.log('duration => ', duration)
 
-        proc.on('end', () => {
-          console.log('Scaled video to 720p')
-          _resolve()
-        })
+          let proc = ffmpeg()
+            .renice(5);
 
-        proc.on('error', (err, err2, err3) => {
-            console.log('Error', err.message)
-            console.log('err2', err2)
-            console.log('err3', err3)
-            _reject(err)
+          if (duration > 5) {
+            proc.addOption('-ss', '00:00:00.000')
+          }
+
+          proc.addInput(file);
+
+          if (duration > 5) {
+            proc.addOption('-t', 5)
+          }
+
+          proc.addOption('-s', 'hd720')
+            .addOption('-c:v', 'libx264')
+            .addOption('-crf', '23')
+            .addOption('-c:a', 'aac')
+            .addOption('-strict', '-2')
+            .addOption('-f', 'mp4')
+            .saveToFile(`${file}_720.mp4`)
+
+          proc.on('end', () => {
+            console.log('Scaled video to 720p')
+            _resolve()
+          })
+
+          proc.on('error', (err, err2, err3) => {
+              console.log('Error', err.message)
+              console.log('err2', err2)
+              console.log('err3', err3)
+              _reject(err)
+          })
         })
     })
   }, { concurrency: 1 })
@@ -120,6 +136,8 @@ const mergeVideos = (videos, temp, tempName) => {
         }, ffmpeg()
         .renice(5)
       .addOption('-strict', 'experimental')
+      .addOption('-crf', 18)
+      .addOption('-r', 30)
     )
 
     proc.on('end', () => resolve())
