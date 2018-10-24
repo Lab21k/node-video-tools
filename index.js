@@ -59,6 +59,28 @@ const titleVideos = (videos, font) => {
   }, {concurrency: 1})
 }
 
+const addOverlay = (video, outPath) => {
+  /*ffmpeg -i input.mp4 -i image.png \
+    -filter_complex "[0:v][1:v] overlay=25:25:enable='between(t,0,20)'" \
+    -pix_fmt yuv420p -c:a copy \
+    output.mp4
+    */
+
+  return new Promise((resolve, reject) => {
+    ffmpeg(`${video}.mp4`)
+      .input(__dirname + '/snapimov-full.png')
+      .addOption('-filter_complex', '[0:v][1:v] overlay=W-w-10:10:enable=\'between(t,0,200)\'')
+      .saveToFile(outPath)
+      .on('end', () => {
+        resolve(`${video}_overlay.mp4`)
+      })
+      .on('error', (err) => {
+        console.log(err)
+        reject(err)
+      })
+  })
+}
+
 const normalizeVideos = (videos) => {
   console.log('Normalizing videos..')
 
@@ -140,7 +162,7 @@ const mergeVideos = (videos, temp, tempName) => {
       .addOption('-r', 30)
     )
 
-    proc.on('end', () => resolve())
+    proc.on('end', () => resolve(tempName))
 
     proc.on('error', (err, err2, err3) => {
         console.log('Error', err.message)
@@ -185,7 +207,10 @@ function audioIntro(videos, outPath, audioPath, text, fontPath) {
     .then(() => {
       console.log('Finally glueing everything together')
       let finalVideo = [`${temp}_intro.mp4`, `${temp}_video_audio.mp4`]
-      return mergeVideos(finalVideo, temp, outPath)
+      return mergeVideos(finalVideo, temp, `${temp}_video_audio_intro.mp4`)
+    })
+    .then(() => {
+      return addOverlay(`${temp}_video_audio_intro`, outPath)
     })
 }
 
@@ -221,7 +246,8 @@ function muteIntro(videos, outPath, audioPath, text, fontPath) {
 
       return mergeVideos(finalVideo, temp, `${temp}_glued_video.mp4`)
     })
-    .then(() => addAudio(`${temp}_glued_video.mp4`, audioPath, outPath))
+    .then(() => addAudio(`${temp}_glued_video.mp4`, audioPath, `${temp}_glued_video_audio.mp4`))
+    .then(() => addOverlay(`${temp}_glued_video_audio`, outPath))
 }
 
 module.exports = {
