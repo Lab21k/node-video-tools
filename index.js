@@ -69,6 +69,7 @@ const addOverlay = (video, outPath) => {
   return new Promise((resolve, reject) => {
     ffmpeg(`${video}.mp4`)
       .input(__dirname + '/snapimov-full.png')
+      .addOption('-strict', 'experimental')
       .addOption('-filter_complex', '[0:v][1:v] overlay=W-w-10:10:enable=\'between(t,0,200)\'')
       .saveToFile(outPath)
       .on('end', () => {
